@@ -1,3 +1,7 @@
 Revision history for Dist-Zilla-Plugin-Git-ExcludeUntracked
 
+0.02 March 17 2013
+     - Remove usage of Archive::Tar::Wrapper, which broke tests (Ivan Bessarabov++)
+
 0.01 March 27 2012
+     - Initial release.

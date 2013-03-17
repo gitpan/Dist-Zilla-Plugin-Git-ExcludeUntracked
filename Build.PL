@@ -7,6 +7,7 @@ use Module::Build 0.3601;
 
 my %module_build_args = (
   "build_requires" => {
+    "Archive::Tar" => 0,
     "Module::Build" => "0.3601"
   },
   "configure_requires" => {
@@ -17,7 +18,7 @@ my %module_build_args = (
     "Rob Hoelz <rob\@hoelz.ro>"
   ],
   "dist_name" => "Dist-Zilla-Plugin-Git-ExcludeUntracked",
-  "dist_version" => "0.01",
+  "dist_version" => "0.02",
   "license" => "perl",
   "module_name" => "Dist::Zilla::Plugin::Git::ExcludeUntracked",
   "recommends" => {},

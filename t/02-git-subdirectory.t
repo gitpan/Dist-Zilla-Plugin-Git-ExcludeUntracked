@@ -9,6 +9,14 @@ use Test::DZil;
 use Archive::Tar;
 use TestUtils;
 
+sub touch_file {
+    my ( $filename ) = @_;
+
+    my $fh;
+    open $fh, '>', $filename or die $!;
+    close $fh;
+}
+
 my $tzil = Builder->from_config(
     { dist_root => 'fake-distributions/Fake' },
     { add_files => {
@@ -30,6 +38,14 @@ chdir $tzil->tempdir->file('source');
 silent_system 'git', 'init';
 silent_system 'git', 'add', 'dist.ini', 'lib/', '.gitignore';
 silent_system 'git', 'commit', '-m', 'Initial commit';
+mkdir 'foo';
+mkdir 'foo/bar';
+touch_file 'foo/bar/baz.txt';
+chdir 'foo';
+silent_system 'git', 'init';
+silent_system 'git', 'add', 'bar/baz.txt';
+silent_system 'git', 'commit', '-m', 'testing';
+chdir '..';
 
 $tzil->build_archive;
 

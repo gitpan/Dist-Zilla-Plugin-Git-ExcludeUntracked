@@ -1,14 +1,28 @@
 ## no critic (RequireUseStrict)
 package Dist::Zilla::Plugin::Git::ExcludeUntracked;
 {
-  $Dist::Zilla::Plugin::Git::ExcludeUntracked::VERSION = '0.02';
+  $Dist::Zilla::Plugin::Git::ExcludeUntracked::VERSION = '0.03';
 }
 
 ## use critic (RequireUseStrict)
 use Moose;
+use File::Find;
 
 with 'Dist::Zilla::Role::FilePruner';
 
+sub _gather_files_under_dir {
+    my ( $self, $dirname ) = @_;
+
+    my @files;
+
+    find(sub {
+        return if -d;
+
+        push @files, $File::Find::name;
+    }, $dirname);
+
+    return @files;
+}
 
 sub _assemble_untracked_lookup {
     my ( $self ) = @_;
@@ -16,6 +30,16 @@ sub _assemble_untracked_lookup {
     my @untracked_files = map {
         chomp; $_
     } qx(git ls-files --other);
+
+    my @subdir_files;
+    foreach my $file (@untracked_files) {
+        if($file =~ m{/$}) {
+            push @subdir_files, $self->_gather_files_under_dir($file);
+            undef $file;
+        }
+    }
+    @untracked_files = grep { defined() } @untracked_files;
+    push @untracked_files, @subdir_files;
 
     return map { $_ => 1 } @untracked_files;
 }
@@ -49,7 +73,7 @@ Dist::Zilla::Plugin::Git::ExcludeUntracked - Excludes untracked files from your 
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -60,9 +84,17 @@ version 0.02
 This L<Dist::Zilla> plugin automatically excludes any files from your
 distribution that are not currently tracked by Git.
 
+=head1 COMPARED TO GIT::GATHERDIR
+
+There's another plugin that provides similar functionality:
+L<Dist::Zilla::Plugin::Git::GatherDir>.  The chief difference is that
+while this plugin is designed to work in concert with
+L<Dist::Zilla::Plugin::GatherDir>, C<Git::GatherDir> is designed to work
+as a replacement for C<GatherDir>.
+
 =head1 SEE ALSO
 
-L<Dist::Zilla>
+L<Dist::Zilla>, L<Dist::Zilla::Plugin::Git::GatherDir>
 
 =begin comment
 
